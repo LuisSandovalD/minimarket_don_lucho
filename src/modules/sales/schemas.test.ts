@@ -1,0 +1,2 @@
+import{describe,expect,it}from"vitest";import{saleSchema}from"./schemas";
+describe("sale schema",()=>{it("accepts mixed payments",()=>expect(saleSchema.parse({idempotencyKey:"123e4567-e89b-42d3-a456-426614174000",customerId:"customer",items:[{productId:"p",quantity:1.35,unitPrice:4.8}],payments:[{method:"CASH",amount:3},{method:"CREDIT",amount:3.48}]}).payments).toHaveLength(2));it("rejects empty carts",()=>expect(()=>saleSchema.parse({idempotencyKey:"123e4567-e89b-42d3-a456-426614174000",customerId:"c",items:[],payments:[]})).toThrow())});
