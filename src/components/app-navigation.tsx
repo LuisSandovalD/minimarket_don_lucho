@@ -1,0 +1,171 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { LucideIcon } from "lucide-react";
+import {
+  LayoutDashboard, ScanBarcode, ShoppingCart, Package, Boxes, Users, Wallet, Banknote,
+  FileSpreadsheet, ChartNoAxesCombined, ShieldCheck, History, Settings, Tags, Wrench,
+  Printer, ReceiptText, ClipboardList, PackagePlus, CircleDollarSign, ContactRound,
+  Layers3, Ruler, Building2, LogOut, UserRound, ChevronDown
+} from "lucide-react";
+import {
+  Sidebar, SidebarProvider, SidebarHeader, SidebarContent, SidebarFooter, SidebarMenu,
+  SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarTrigger, SidebarGroup,
+  SidebarGroupLabel, SidebarGroupContent, SidebarRail
+} from "./ui/sidebar";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuLabel
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import { ThemeToggle } from "./theme-toggle";
+import { logoutAction } from "@/modules/auth/actions";
+
+const logoImage = process.env.NEXT_PUBLIC_LOGO_IMAGE;
+
+type NavItem = readonly [string, string, string, LucideIcon];
+type NavGroup = { group: string; items: readonly NavItem[] };
+
+const nav: readonly NavGroup[] = [
+  { group: "General", items: [["Inicio", "/dashboard", "dashboard.view", LayoutDashboard], ["Punto de venta", "/pos", "sales.create", ScanBarcode], ["Operaciones", "/operations", "dashboard.view", Wrench]] },
+  { group: "Ventas", items: [["Ventas", "/sales", "sales.view", ReceiptText], ["Nueva venta", "/sales/new", "sales.create", ShoppingCart], ["Clientes", "/manage/customers", "customers.view", ContactRound], ["Fiados y créditos", "/credits", "credits.view", Wallet]] },
+  { group: "Productos", items: [["Productos", "/products", "products.view", Package], ["Etiquetas QR/barras", "/products/labels", "products.view", Printer], ["Categorías", "/manage/categories", "products.view", Layers3], ["Marcas", "/manage/brands", "products.view", Tags], ["Unidades", "/manage/units", "products.view", Ruler], ["Inventario", "/inventory", "inventory.view", Boxes]] },
+  { group: "Compras", items: [["Compras", "/purchases", "purchases.view", ClipboardList], ["Nueva compra", "/purchases/new", "purchases.create", PackagePlus], ["Proveedores", "/manage/suppliers", "suppliers.view", Building2]] },
+  { group: "Finanzas", items: [["Caja", "/cash", "cash.view", Banknote], ["Gastos", "/expenses", "expenses.view", CircleDollarSign]] },
+  { group: "Gestión", items: [["Importaciones", "/imports", "imports.view", FileSpreadsheet], ["Reportes", "/reports", "reports.sales", ChartNoAxesCombined], ["Usuarios", "/manage/users", "users.view", Users], ["Roles y permisos", "/manage/roles", "roles.view", ShieldCheck], ["Auditoría", "/audit", "audit.view", History], ["Configuración", "/settings", "settings.view", Settings]] }
+];
+
+export function AppNavigation({ user, cashOpen, children }: {
+  user: { name: string; roles: string[]; permissions: string[] };
+  cashOpen: boolean;
+  children: React.ReactNode;
+}) {
+  const path = usePathname();
+  const groups = nav.map(g => ({ ...g, items: g.items.filter(([, , p]) => user.permissions.includes(p)) })).filter(g => g.items.length);
+  const active = groups.flatMap(g => [...g.items]).filter(([, href]) => path === href || (href !== "/dashboard" && path.startsWith(`${href}/`))).sort((a, b) => b[1].length - a[1].length)[0];
+  const initials = user.name.split(" ").filter(Boolean).slice(0, 2).map(n => n[0]).join("").toUpperCase();
+  const role = user.roles[0] ?? "Usuario";
+
+  return (
+    <SidebarProvider>
+      <Sidebar collapsible="icon" variant="inset">
+        <SidebarHeader className="p-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild size="lg" tooltip="Minimarket Don Lucho" className="h-14 p-1 hover:bg-transparent">
+                <Link href="/dashboard" className="flex items-center gap-3">
+                  {logoImage && (
+                    <div className="relative size-10 shrink-0 overflow-hidden">
+                      <Image src={logoImage} alt="Minimarket Don Lucho" fill priority sizes="40px" className="object-contain" />
+                    </div>
+                  )}
+                  <div className="min-w-0 group-data-[collapsible=icon]:hidden">
+                    <p className="truncate text-sm font-semibold">Minimarket Don Lucho</p>
+                    <p className="truncate text-xs text-muted-foreground">Gestión comercial</p>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+
+        <SidebarContent>
+          {groups.map(group => (
+            <SidebarGroup key={group.group}>
+              <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {group.items.map(([label, href, , Icon]) => (
+                    <SidebarMenuItem key={href}>
+                      <SidebarMenuButton asChild isActive={active?.[1] === href} tooltip={label}>
+                        <Link href={href}><Icon /><span>{label}</span></Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ))}
+        </SidebarContent>
+
+        <SidebarFooter>
+          <div className="flex items-center gap-3 rounded-xl bg-muted/40 p-2 group-data-[collapsible=icon]:justify-center">
+            <Avatar className="size-8 shrink-0">
+              <AvatarFallback className="text-xs font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+              <p className="truncate text-sm font-medium">{user.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{role}</p>
+            </div>
+          </div>
+        </SidebarFooter>
+
+        <SidebarRail />
+      </Sidebar>
+
+      <SidebarInset>
+        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center bg-background/90 px-3 shadow-sm backdrop-blur-xl sm:h-16 sm:px-4 md:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <SidebarTrigger />
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-semibold sm:text-base">{active?.[0] ?? "Minimarket Don Lucho"}</h1>
+              <p className="hidden text-xs text-muted-foreground md:block">Gestión interna del minimarket</p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <Badge variant="secondary" className="hidden rounded-full px-3 py-1 font-normal lg:flex">
+              <span aria-hidden="true" className={`mr-2 size-2 rounded-full ${cashOpen ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
+              {cashOpen ? "Caja abierta" : "Caja cerrada"}
+            </Badge>
+
+            <ThemeToggle />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-10 gap-2 rounded-xl px-2" aria-label="Menú de usuario">
+                  <Avatar className="size-8">
+                    <AvatarFallback className="text-xs font-semibold">{initials}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden max-w-32 truncate text-sm xl:block">{user.name}</span>
+                  <ChevronDown className="hidden size-3.5 text-muted-foreground xl:block" />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" sideOffset={8} className="w-56 border-0 shadow-xl">
+                <DropdownMenuLabel>
+                  <p className="truncate">{user.name}</p>
+                  <p className="truncate text-xs font-normal text-muted-foreground">{user.roles.join(", ")}</p>
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem asChild>
+                  <Link href="/profile"><UserRound className="size-4" />Perfil</Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link href="/settings"><Settings className="size-4" />Configuración</Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => void logoutAction()}>
+                  <LogOut className="size-4" />Cerrar sesión
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden">
+          <div className="w-full p-3 sm:p-4 md:p-6">{children}</div>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}

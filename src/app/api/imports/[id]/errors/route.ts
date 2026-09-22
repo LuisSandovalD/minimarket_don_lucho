@@ -1,0 +1,5 @@
+import ExcelJS from "exceljs";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { requirePermission } from "@/lib/auth";
+export async function GET(_: Request, context: { params: Promise<{ id: string }> }) { await requirePermission("imports.view"); const { id } = await context.params; const rows = await db.importError.findMany({ where: { importJobId: id }, orderBy: { rowNumber: "asc" } }); const workbook = new ExcelJS.Workbook(); const sheet = workbook.addWorksheet("ERRORES"); sheet.columns = [{ header: "Fila", key: "row" }, { header: "Campo", key: "field" }, { header: "Valor", key: "value" }, { header: "Error", key: "error" }]; rows.forEach(row => sheet.addRow({ row: row.rowNumber, field: row.field ?? "", value: row.value ?? "", error: row.message })); const buffer = await workbook.xlsx.writeBuffer(); return new NextResponse(Buffer.from(buffer), { headers: { "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "content-disposition": "attachment; filename=reporte-errores.xlsx" } }); }
