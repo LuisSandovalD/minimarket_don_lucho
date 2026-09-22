@@ -1,15 +1,10 @@
 "use client";
-<<<<<<< HEAD
 
 import { useActionState, useState } from "react";
-=======
-import { useActionState } from "react";
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
 import { createProductAction } from "@/modules/products/actions";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-<<<<<<< HEAD
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { Loader2, Save } from "lucide-react";
@@ -45,6 +40,3 @@ export function ProductForm({ units, categories, brands }: { units: { id: string
     <div className="sm:col-span-2 xl:col-span-3"><Button type="submit" disabled={pending || !unitOfMeasureId} size="lg">{pending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}{pending ? "Guardando..." : "Guardar producto"}</Button></div>
   </form>;
 }
-=======
-export function ProductForm({ units, categories, brands }: { units: {id:string;name:string;symbol:string;type:string;allowsDecimals:boolean}[]; categories:{id:string;name:string}[]; brands:{id:string;name:string}[] }) { const [state,action,pending] = useActionState(createProductAction,null); return <form action={action} className="grid gap-4 md:grid-cols-2"><div className="space-y-2 md:col-span-2"><Label htmlFor="name">Nombre *</Label><Input id="name" name="name" required /></div><div className="space-y-2"><Label htmlFor="sku">SKU (opcional)</Label><Input id="sku" name="sku" placeholder="Se genera automáticamente" /></div><div className="space-y-2"><Label htmlFor="barcode">Código de barras</Label><Input id="barcode" name="barcode" inputMode="numeric" /></div><div className="space-y-2"><Label htmlFor="categoryId">Categoría</Label><select id="categoryId" name="categoryId" className="h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]"><option value="">Sin categoría</option>{categories.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></div><div className="space-y-2"><Label htmlFor="brandId">Marca</Label><select id="brandId" name="brandId" className="h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]"><option value="">Sin marca</option>{brands.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></div><div className="space-y-2"><Label htmlFor="unitOfMeasureId">Unidad *</Label><select id="unitOfMeasureId" name="unitOfMeasureId" required className="h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]">{units.map(x=><option key={x.id} value={x.id}>{x.name} ({x.symbol})</option>)}</select></div><div className="space-y-2"><Label htmlFor="saleType">Tipo de venta *</Label><select id="saleType" name="saleType" className="h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]"><option value="QUANTITY">Cantidad</option><option value="WEIGHT">Peso</option><option value="VOLUME">Volumen</option><option value="OTHER">Otro</option></select></div>{[["purchasePrice","Precio compra"],["salePrice","Precio venta"],["wholesalePrice","Precio mayorista"],["stock","Stock inicial"],["minimumStock","Stock mínimo"]].map(([name,label])=><div key={name} className="space-y-2"><Label htmlFor={name}>{label}{name==="salePrice"?" *":""}</Label><Input id={name} name={name} type="number" min="0" step="0.0001" defaultValue={name==="stock"||name==="minimumStock"||name==="purchasePrice"?"0":undefined} required={name==="salePrice"||name==="purchasePrice"}/></div>)}<input type="hidden" name="allowsDiscount" value="true"/><div className="flex items-center gap-2 md:col-span-2"><input id="allowsDecimals" name="allowsDecimals" type="checkbox" value="true"/><Label htmlFor="allowsDecimals">Permitir cantidades decimales</Label></div>{state && !state.success && <p className="text-sm text-[var(--danger)] md:col-span-2">{state.message}</p>}{state?.success && <p className="text-sm text-emerald-600 md:col-span-2">Producto registrado correctamente.</p>}<div className="md:col-span-2"><Button disabled={pending}>{pending?"Guardando…":"Guardar producto"}</Button></div></form>; }
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
