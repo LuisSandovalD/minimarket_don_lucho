@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 
 export async function GET(request: Request) {
-  await requirePermission("products.view");
+  const user = await requireUser();
+  const allowed = ["products.view", "sales.create", "purchases.create"].some(permission => user.permissions.includes(permission));
+  if (!allowed) return NextResponse.json({ message: "No tienes permiso para consultar productos." }, { status: 403 });
+
   const url = new URL(request.url);
   const q = url.searchParams.get("q")?.trim() ?? "";
   const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 20) || 20));
