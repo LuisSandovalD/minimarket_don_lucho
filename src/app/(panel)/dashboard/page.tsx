@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
 import { money } from "@/lib/utils";
-<<<<<<< HEAD
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Banknote, Boxes, CircleDollarSign, CreditCard, ReceiptText, ShoppingCart, TrendingUp, WalletCards } from "lucide-react";
@@ -157,7 +156,3 @@ export default async function DashboardPage() {
         </div>
     );
 }
-=======
-export const dynamic = "force-dynamic";
-export default async function DashboardPage() { const user = await requirePermission("dashboard.view"); const start = new Date(); start.setHours(0,0,0,0); const [sales, payments, lowStock, debts, expenses] = await Promise.all([db.sale.aggregate({ where: { createdAt: { gte: start }, status: { not: "CANCELLED" } }, _sum: { total: true }, _count: true }),db.salePayment.groupBy({ by: ["method"], where: { sale: { createdAt: { gte: start }, status: { not: "CANCELLED" } } }, _sum: { amount: true } }),db.product.count({ where: { active: true, deletedAt: null, stock: { lte: db.product.fields.minimumStock } } }),db.customerCredit.aggregate({ _sum: { balance: true } }),db.expense.aggregate({ where: { createdAt: { gte: start }, status: "ACTIVE" }, _sum: { amount: true } })]); const canProfit = user.permissions.includes("reports.profit"); return <div className="space-y-7"><div><h1 className="text-2xl font-semibold">Resumen de hoy</h1><p className="text-sm text-[var(--muted)]">Información real de la operación del minimarket.</p></div><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[["Ventas",money(sales._sum.total?.toString() ?? 0)],["Operaciones",String(sales._count)],["Deuda pendiente",money(debts._sum.balance?.toString() ?? 0)],["Stock bajo",String(lowStock)]].map(([label,value]) => <div key={label} className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><p className="text-sm text-[var(--muted)]">{label}</p><p className="mt-2 text-2xl font-semibold">{value}</p></div>)}</section><section className="grid gap-5 lg:grid-cols-2"><div className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><h2 className="font-semibold">Métodos de pago de hoy</h2><div className="mt-4 space-y-3">{payments.length ? payments.map(row => <div key={row.method} className="flex justify-between text-sm"><span>{row.method}</span><strong>{money(row._sum.amount?.toString() ?? 0)}</strong></div>) : <p className="text-sm text-[var(--muted)]">Aún no hay ventas registradas.</p>}</div></div><div className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><h2 className="font-semibold">Control operativo</h2><div className="mt-4 space-y-3 text-sm"><div className="flex justify-between"><span>Gastos de hoy</span><strong>{money(expenses._sum.amount?.toString() ?? 0)}</strong></div>{canProfit && <div className="flex justify-between"><span>Resultado antes de costo</span><strong>{money(Number(sales._sum.total ?? 0)-Number(expenses._sum.amount ?? 0))}</strong></div>}</div></div></section></div>; }
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

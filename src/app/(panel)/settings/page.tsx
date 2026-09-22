@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
 import { SettingsForm } from "@/components/settings-form";
@@ -52,7 +51,3 @@ export default async function Page() {
         </div>
     );
 }
-=======
-import{db}from"@/lib/db";import{requirePermission}from"@/lib/auth";
-export const dynamic="force-dynamic";export default async function SettingsPage(){await requirePermission("settings.view");const s=await db.businessSettings.upsert({where:{id:"singleton"},create:{},update:{}});return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Configuración</h1><p className="text-sm text-[var(--muted)]">Parámetros vigentes del negocio.</p></div><dl className="grid gap-4 rounded-xl bg-[var(--card)] p-6 shadow-sm sm:grid-cols-2">{[["Nombre",s.businessName],["RUC",s.ruc||"Sin configurar"],["Moneda",s.currency],["Prefijo SKU",s.skuPrefix],["Prefijo ventas",s.salePrefix],["IGV",`${s.taxRate}%`],["Alerta de vencimiento",`${s.expirationAlertDays} días`],["Ticket",`${s.ticketWidth} mm`]].map(([k,v])=><div key={k}><dt className="text-sm text-[var(--muted)]">{k}</dt><dd className="font-medium">{v}</dd></div>)}</dl></div>}
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

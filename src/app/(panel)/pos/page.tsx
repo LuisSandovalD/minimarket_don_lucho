@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Pos } from "@/components/pos";
@@ -64,7 +63,3 @@ export default async function PosPage() {
         </div>
     );
 }
-=======
-import{requirePermission}from"@/lib/auth";import{db}from"@/lib/db";import{Pos}from"@/components/pos";
-export const dynamic="force-dynamic";export default async function PosPage(){await requirePermission("sales.create");const customer=await db.customer.findFirst({where:{general:true}});if(!customer)return <p>Ejecuta el seed para crear Cliente General.</p>;return <div className="space-y-4"><div><h1 className="text-2xl font-semibold">Punto de venta</h1><p className="text-sm text-[var(--muted)]">Escanea, cobra y vuelve a vender sin usar el mouse.</p></div><Pos customerId={customer.id}/></div>}
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

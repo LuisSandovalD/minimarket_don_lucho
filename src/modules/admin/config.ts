@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   BadgeDollarSign,
-  Boxes,
   Building2,
   ContactRound,
   Layers3,

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { money } from "@/lib/utils";
@@ -69,7 +68,3 @@ export default async function ReportsPage() {
     </div>
   );
 }
-=======
-import{db}from"@/lib/db";import{requirePermission}from"@/lib/auth";import{money}from"@/lib/utils";
-export const dynamic="force-dynamic";export default async function ReportsPage(){await requirePermission("reports.sales");const start=new Date();start.setDate(1);start.setHours(0,0,0,0);const[sales,costs,expenses]=await Promise.all([db.sale.aggregate({where:{createdAt:{gte:start},status:{not:"CANCELLED"}},_sum:{total:true},_count:true}),db.saleItem.aggregate({where:{sale:{createdAt:{gte:start},status:{not:"CANCELLED"}}},_sum:{subtotal:true}}),db.expense.aggregate({where:{createdAt:{gte:start},status:"ACTIVE"},_sum:{amount:true}})]);return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Reportes</h1><p className="text-sm text-[var(--muted)]">Resumen del mes actual.</p></div><div className="grid gap-4 sm:grid-cols-3"><div className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><p className="text-sm text-[var(--muted)]">Ventas</p><p className="mt-2 text-2xl font-semibold">{money(sales._sum.total?.toString()??0)}</p></div><div className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><p className="text-sm text-[var(--muted)]">Operaciones</p><p className="mt-2 text-2xl font-semibold">{sales._count}</p></div><div className="rounded-xl bg-[var(--card)] p-5 shadow-sm"><p className="text-sm text-[var(--muted)]">Gastos</p><p className="mt-2 text-2xl font-semibold">{money(expenses._sum.amount?.toString()??0)}</p></div></div><p className="text-xs text-[var(--muted)]">Los reportes consultan PostgreSQL; no contienen valores simulados. Total de líneas: {money(costs._sum.subtotal?.toString()??0)}.</p></div>}
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

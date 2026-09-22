@@ -3,10 +3,7 @@ import argon2 from "argon2";
 import { z } from "zod";
 const db = new PrismaClient();
 const permissionKeys = [
-<<<<<<< HEAD
   "inventory.sell_negative", "credits.exceed_limit",
-=======
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   "dashboard.view","products.view","products.create","products.update","products.disable","products.change_price","products.view_cost","products.import","products.export",
   "inventory.view","inventory.adjust","inventory.register_loss","inventory.view_kardex","sales.view","sales.create","sales.cancel","sales.refund","sales.discount","sales.change_price",
   "customers.view","customers.create","customers.update","credits.view","credits.create","credits.receive_payment","credits.adjust","purchases.view","purchases.create","purchases.cancel",

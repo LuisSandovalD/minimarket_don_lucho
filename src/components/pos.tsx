@@ -50,7 +50,17 @@ export function Pos({ customerId, customers }: { customerId: string; customers: 
     }
 
     useEffect(() => { const t = setTimeout(() => void search(q), 220); return () => clearTimeout(t) }, [q, search]);
-    useEffect(() => setPayments(p => p.length === 1 && p[0].method === "CASH" ? [{ ...p[0], amount: total }] : p), [total]);
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setPayments((p) =>
+                p.length === 1 && p[0].method === "CASH"
+                    ? [{ ...p[0], amount: total }]
+                    : p
+            )
+        }, 0)
+
+        return () => clearTimeout(timeout)
+    }, [total])
     useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === "F2") { e.preventDefault(); searchRef.current?.focus() } if (e.key === "F4") { e.preventDefault(); document.getElementById("pos-customer")?.focus() } if (e.key === "F8") { e.preventDefault(); document.getElementById("charge")?.click() } if (e.key === "Escape") setResults([]) }; window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h) }, []);
 
     return <div className="grid gap-5 xl:grid-cols-[.8fr_1.4fr_.9fr]">

@@ -1,5 +1,4 @@
 import Link from "next/link";
-<<<<<<< HEAD
 import { ChevronLeft, ChevronRight, Package, Plus, Search } from "lucide-react";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
@@ -144,13 +143,3 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
         </div>
     );
 }
-=======
-import { Plus } from "lucide-react";
-import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth";
-import { money } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-export const dynamic="force-dynamic";
-export default async function ProductsPage({ searchParams }: { searchParams: Promise<{q?:string;page?:string}> }) { await requirePermission("products.view"); const {q,page="1"}=await searchParams; const current=Math.max(1,Number(page)||1); const where={active:true,deletedAt:null,...(q?{OR:[{name:{contains:q,mode:"insensitive" as const}},{sku:{contains:q,mode:"insensitive" as const}},{barcodes:{some:{code:{contains:q}}}}]}:{})}; const [products,total]=await Promise.all([db.product.findMany({where,include:{unitOfMeasure:true,category:true,barcodes:{where:{primary:true},take:1}},orderBy:{name:"asc"},skip:(current-1)*25,take:25}),db.product.count({where})]); return <div className="space-y-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-semibold">Productos</h1><p className="text-sm text-[var(--muted)]">{total} productos activos</p></div><Button asChild><Link href="/products/new"><Plus className="size-4"/>Nuevo producto</Link></Button></div><form className="max-w-md"><input name="q" defaultValue={q} placeholder="Buscar por nombre, SKU o código…" className="h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]"/></form><div className="overflow-hidden rounded-xl bg-[var(--card)] shadow-sm"><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50 text-left text-[var(--muted)] dark:bg-slate-900"><tr><th className="px-4 py-3">Producto</th><th className="px-4 py-3">SKU / código</th><th className="px-4 py-3 text-right">Precio</th><th className="px-4 py-3 text-right">Stock</th><th className="px-4 py-3">Estado</th></tr></thead><tbody>{products.map(product=><tr key={product.id} className="border-t"><td className="px-4 py-3"><p className="font-medium">{product.name}</p><p className="text-xs text-[var(--muted)]">{product.category?.name??"Sin categoría"}</p></td><td className="px-4 py-3"><p>{product.sku}</p><p className="text-xs text-[var(--muted)]">{product.barcodes[0]?.code??"—"}</p></td><td className="px-4 py-3 text-right">{money(product.salePrice.toString())}</td><td className="px-4 py-3 text-right">{product.stock.toString()} {product.unitOfMeasure.symbol}</td><td className="px-4 py-3"><Badge className={product.stock.lessThanOrEqualTo(product.minimumStock)?"bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200":undefined}>{product.stock.lessThanOrEqualTo(product.minimumStock)?"Stock bajo":"Disponible"}</Badge></td></tr>)}</tbody></table></div>{!products.length&&<p className="p-8 text-center text-sm text-[var(--muted)]">No se encontraron productos.</p>}</div></div>; }
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import Image from "next/image";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -47,8 +46,3 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
     </main>;
 }
-=======
-import { Store } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-export default function AuthLayout({ children }: { children: React.ReactNode }) { return <main className="grid min-h-screen lg:grid-cols-2"><section className="hidden bg-emerald-950 p-12 text-white lg:flex lg:flex-col lg:justify-between"><div className="flex items-center gap-3 text-xl font-semibold"><Store className="size-7"/>Minimarket Don Lucho</div><div><h1 className="max-w-xl text-4xl font-semibold leading-tight">Ventas, inventario, caja y fiados en un solo sistema.</h1><p className="mt-4 max-w-lg text-emerald-100">Operación rápida y segura para el trabajo diario del minimarket.</p></div><p className="text-sm text-emerald-200">Sistema administrativo comercial</p></section><section className="relative flex items-center justify-center p-6"><div className="absolute right-5 top-5"><ThemeToggle/></div>{children}</section></main>; }
->>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
