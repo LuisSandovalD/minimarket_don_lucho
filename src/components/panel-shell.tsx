@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -9,3 +10,16 @@ export async function PanelShell({ children }: { children: React.ReactNode }) {
   const cashOpen = !!(await db.cashSession.findFirst({ where: { userId: user.id, status: "OPEN" }, select: { id: true } }));
   return <AppNavigation user={user} cashOpen={cashOpen}>{children}</AppNavigation>;
 }
+=======
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { BarChart3, Boxes, ClipboardList, FileSpreadsheet, Gauge, Package, ReceiptText, ScanBarcode, Settings, ShoppingCart, Store, Users, WalletCards } from "lucide-react";
+import { getSessionUser } from "@/lib/auth";
+import { logoutAction } from "@/modules/auth/actions";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+const navigation = [
+  ["Dashboard","/dashboard",Gauge,"dashboard.view"],["Punto de venta","/pos",ScanBarcode,"sales.create"],["Productos","/products",Package,"products.view"],["Inventario","/inventory",Boxes,"inventory.view"],["Ventas","/sales",ShoppingCart,"sales.view"],["Clientes y fiados","/customers",Users,"customers.view"],["Compras","/purchases",ClipboardList,"purchases.view"],["Caja","/cash",WalletCards,"cash.view"],["Importaciones","/imports",FileSpreadsheet,"imports.view"],["Reportes","/reports",BarChart3,"reports.sales"],["Auditoría","/audit",ReceiptText,"audit.view"],["Configuración","/settings",Settings,"settings.view"]
+] as const;
+export async function PanelShell({ children }: { children: React.ReactNode }) { const user = await getSessionUser(); if (!user) redirect("/login"); return <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr]"><aside className="hidden min-h-screen bg-emerald-950 text-white lg:block"><div className="sticky top-0 p-4"><Link href="/dashboard" className="flex h-14 items-center gap-3 px-2 font-semibold"><Store className="size-6"/><span>Don Lucho</span></Link><nav className="mt-5 space-y-1">{navigation.filter(([, , , permission]) => user.permissions.includes(permission)).map(([label,href,Icon]) => <Link key={href} href={href} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-emerald-50 transition hover:bg-white/10"><Icon className="size-4"/>{label}</Link>)}</nav></div></aside><div><header className="sticky top-0 z-20 flex h-16 items-center justify-between bg-[var(--card)] px-5 shadow-sm"><Link href="/dashboard" className="flex items-center gap-2 font-semibold lg:hidden"><Store className="size-5"/>Don Lucho</Link><div className="ml-auto flex items-center gap-2"><ThemeToggle/><div className="hidden text-right sm:block"><p className="text-sm font-medium">{user.name}</p><p className="text-xs text-[var(--muted)]">{user.roles.join(", ")}</p></div><form action={logoutAction}><Button variant="ghost" size="sm">Salir</Button></form></div></header><main className="p-5 lg:p-8">{children}</main></div></div>; }
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

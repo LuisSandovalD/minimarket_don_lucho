@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { money } from "@/lib/utils";
@@ -64,3 +65,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
     </Card>
   </div>;
 }
+=======
+import{db}from"@/lib/db";import{requirePermission}from"@/lib/auth";import{money}from"@/lib/utils";
+export const dynamic="force-dynamic";export default async function CustomersPage(){await requirePermission("customers.view");const customers=await db.customer.findMany({where:{active:true,deletedAt:null},include:{credit:true},orderBy:[{general:"desc"},{firstName:"asc"}]});return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Clientes y fiados</h1><p className="text-sm text-[var(--muted)]">Cuenta corriente y límites de crédito.</p></div><div className="overflow-x-auto rounded-xl bg-[var(--card)] shadow-sm"><table className="w-full text-sm"><thead><tr className="text-left"><th className="p-3">Cliente</th><th className="p-3">Documento</th><th className="p-3 text-right">Límite</th><th className="p-3 text-right">Deuda</th></tr></thead><tbody>{customers.map(x=><tr className="border-t" key={x.id}><td className="p-3 font-medium">{x.legalName||`${x.firstName??""} ${x.lastName??""}`}</td><td className="p-3">{x.dni||x.ruc||"—"}</td><td className="p-3 text-right">{money(x.creditLimit.toString())}</td><td className="p-3 text-right">{money(x.credit?.balance.toString()??0)}</td></tr>)}</tbody></table></div></div>}
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

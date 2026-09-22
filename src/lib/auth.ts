@@ -32,9 +32,14 @@ export async function getSessionUser() {
   if (!token) return null;
   const session = await db.session.findUnique({ where: { tokenHash: hashToken(token) }, include: { user: { include: { roles: { include: { role: { include: { permissions: { include: { permission: true } } } } } } } } } });
   if (!session || session.expiresAt <= new Date() || !session.user.active || session.user.deletedAt) return null;
+<<<<<<< HEAD
   const activeRoles = session.user.roles.filter(({ role }) => role.active);
   const permissions = [...new Set(activeRoles.flatMap(({ role }) => role.permissions.map(({ permission }) => permission.key)))];
   return { id: session.user.id, name: session.user.name, email: session.user.email, imageUrl: session.user.imageUrl, roles: activeRoles.map(({ role }) => role.name), permissions };
+=======
+  const permissions = [...new Set(session.user.roles.flatMap(({ role }) => role.permissions.map(({ permission }) => permission.key)))];
+  return { id: session.user.id, name: session.user.name, email: session.user.email, imageUrl: session.user.imageUrl, roles: session.user.roles.map(({ role }) => role.name), permissions };
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
 }
 
 export async function requireUser() { const user = await getSessionUser(); if (!user) throw new AppError("UNAUTHORIZED", "Debes iniciar sesión.", 401); return user; }

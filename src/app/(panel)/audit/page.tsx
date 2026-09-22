@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -136,3 +137,7 @@ export default async function AuditPage() {
         </TooltipProvider>
     );
 }
+=======
+import{db}from"@/lib/db";import{requirePermission}from"@/lib/auth";
+export const dynamic="force-dynamic";export default async function AuditPage(){await requirePermission("audit.view");const rows=await db.auditLog.findMany({include:{user:true},orderBy:{createdAt:"desc"},take:200});return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Auditoría</h1><p className="text-sm text-[var(--muted)]">Registro inmutable de acciones sensibles.</p></div><div className="overflow-x-auto rounded-xl bg-[var(--card)] shadow-sm"><table className="w-full text-sm"><thead><tr className="text-left"><th className="p-3">Fecha</th><th className="p-3">Usuario</th><th className="p-3">Módulo</th><th className="p-3">Acción</th><th className="p-3">Recurso</th><th className="p-3">IP</th></tr></thead><tbody>{rows.map(x=><tr className="border-t" key={x.id}><td className="p-3">{x.createdAt.toLocaleString("es-PE")}</td><td className="p-3">{x.user?.name||"Sistema"}</td><td className="p-3">{x.module}</td><td className="p-3">{x.action}</td><td className="p-3">{x.resource}</td><td className="p-3">{x.ip||"—"}</td></tr>)}</tbody></table></div></div>}
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

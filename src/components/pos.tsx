@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CameraScanner } from "./camera-scanner";
@@ -76,3 +77,28 @@ export function Pos({ customerId, customers }: { customerId: string; customers: 
         </CardContent></Card>
     </div>;
 }
+=======
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Minus, Plus, Search, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { money } from "@/lib/utils";
+type Product={id:string;sku:string;name:string;price:string;stock:string;allowsDecimals:boolean;unit:string};
+type Line=Product&{quantity:number};
+export function Pos({customerId}:{customerId:string}) {
+  const [query,setQuery]=useState(""); const [results,setResults]=useState<Product[]>([]); const [cart,setCart]=useState<Line[]>([]);
+  const [payment,setPayment]=useState<"CASH"|"YAPE"|"PLIN"|"CARD"|"TRANSFER">("CASH"); const [received,setReceived]=useState(""); const [loading,setLoading]=useState(false); const input=useRef<HTMLInputElement>(null);
+  const total=cart.reduce((sum,line)=>sum+Number(line.price)*line.quantity,0);
+  const add=useCallback((product:Product)=>{setCart(current=>{const found=current.find(x=>x.id===product.id);return found?current.map(x=>x.id===product.id?{...x,quantity:x.quantity+1}:x):[...current,{...product,quantity:1}]});setQuery("");setResults([]);requestAnimationFrame(()=>input.current?.focus())},[]);
+  const search=useCallback(async(value:string)=>{if(!value.trim()){setResults([]);return}const response=await fetch(`/api/products/search?q=${encodeURIComponent(value)}`);const json=await response.json();if(json.data.length===1&&(json.data[0].sku.toLowerCase()===value.toLowerCase()))add(json.data[0]);else setResults(json.data)},[add]);
+  useEffect(()=>{const timer=setTimeout(()=>search(query),200);return()=>clearTimeout(timer)},[query,search]);
+  useEffect(()=>{const key=(event:KeyboardEvent)=>{if(event.key==="F2"){event.preventDefault();input.current?.focus()}if(event.key==="F8"){event.preventDefault();document.getElementById("charge")?.click()}};window.addEventListener("keydown",key);return()=>window.removeEventListener("keydown",key)},[]);
+  async function charge(){if(!cart.length)return;setLoading(true);try{const response=await fetch("/api/sales",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({idempotencyKey:crypto.randomUUID(),customerId,discount:0,items:cart.map(x=>({productId:x.id,quantity:x.quantity,unitPrice:x.price,discount:0})),payments:[{method:payment,amount:total,receivedAmount:payment==="CASH"?Number(received||total):undefined}]})});const json=await response.json();if(!response.ok)throw new Error(json.message);toast.success(`Venta ${json.data.code} registrada`);setCart([]);setReceived("");input.current?.focus()}catch(error){toast.error(error instanceof Error?error.message:"No se pudo registrar la venta")}finally{setLoading(false)}}
+  return <div className="grid min-h-[calc(100vh-8rem)] gap-5 xl:grid-cols-[1fr_1.4fr_.8fr]">
+    <section className="space-y-3"><div className="relative"><Search className="absolute left-3 top-3 size-4 text-[var(--muted)]"/><Input ref={input} autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder="Escanea o busca (F2)" className="pl-9"/></div><div className="space-y-2">{results.map(product=><button key={product.id} onClick={()=>add(product)} className="flex w-full justify-between rounded-xl bg-[var(--card)] p-4 text-left shadow-sm hover:ring-2 hover:ring-[var(--primary)]"><span><strong className="block">{product.name}</strong><span className="text-xs text-[var(--muted)]">{product.sku} · Stock {product.stock}</span></span><strong>{money(product.price)}</strong></button>)}</div></section>
+    <section className="rounded-xl bg-[var(--card)] p-4 shadow-sm"><h2 className="font-semibold">Carrito</h2><div className="mt-4 space-y-2">{cart.map(line=><div key={line.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-lg bg-slate-50 p-3 dark:bg-slate-900"><div><p className="font-medium">{line.name}</p><p className="text-xs text-[var(--muted)]">{money(line.price)} / {line.unit}</p></div><div className="flex items-center"><Button variant="ghost" size="icon" onClick={()=>setCart(c=>c.map(x=>x.id===line.id?{...x,quantity:Math.max(line.allowsDecimals?.001:1,x.quantity-(line.allowsDecimals?.001:1))}:x))}><Minus className="size-4"/></Button><input aria-label={`Cantidad de ${line.name}`} className="w-16 bg-transparent text-center" type="number" min={line.allowsDecimals?.001:1} step={line.allowsDecimals?.001:1} value={line.quantity} onChange={e=>setCart(c=>c.map(x=>x.id===line.id?{...x,quantity:Number(e.target.value)}:x))}/><Button variant="ghost" size="icon" onClick={()=>setCart(c=>c.map(x=>x.id===line.id?{...x,quantity:x.quantity+(line.allowsDecimals?.001:1)}:x))}><Plus className="size-4"/></Button></div><div className="flex items-center gap-2"><strong>{money(Number(line.price)*line.quantity)}</strong><Button variant="ghost" size="icon" onClick={()=>setCart(c=>c.filter(x=>x.id!==line.id))}><Trash2 className="size-4"/></Button></div></div>)}{!cart.length&&<p className="py-20 text-center text-sm text-[var(--muted)]">Escanea un producto para comenzar.</p>}</div></section>
+    <aside className="h-fit rounded-xl bg-[var(--card)] p-5 shadow-sm"><p className="text-sm text-[var(--muted)]">Total</p><p className="mt-1 text-4xl font-semibold">{money(total)}</p><label className="mt-6 block text-sm font-medium">Método de pago</label><select value={payment} onChange={e=>setPayment(e.target.value as typeof payment)} className="mt-2 h-10 w-full rounded-lg bg-[var(--card)] px-3 ring-1 ring-[var(--border)]"><option value="CASH">Efectivo</option><option value="YAPE">Yape</option><option value="PLIN">Plin</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option></select>{payment==="CASH"&&<><label className="mt-4 block text-sm font-medium">Recibido</label><Input value={received} onChange={e=>setReceived(e.target.value)} type="number" min={total} step="0.01" className="mt-2"/><p className="mt-2 text-sm text-[var(--muted)]">Vuelto: {money(Math.max(0,Number(received||0)-total))}</p></>}<Button id="charge" className="mt-6 w-full" disabled={!cart.length||loading||(payment==="CASH"&&Number(received||0)<total)} onClick={charge}>{loading?"Procesando…":"Cobrar (F8)"}</Button></aside>
+  </div>
+}
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

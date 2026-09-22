@@ -344,7 +344,10 @@ model ProductBatch {
   receivedAt  DateTime
   expiresAt   DateTime?
   product     Product  @relation(fields: [productId], references: [id])
+<<<<<<< HEAD
   saleAllocations SaleBatchAllocation[]
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   @@unique([productId, batchNumber])
   @@index([expiresAt])
 }
@@ -511,7 +514,10 @@ model CreditPayment {
   createdAt     DateTime       @default(now())
   credit        CustomerCredit @relation(fields: [creditId], references: [id])
   cashSession   CashSession?   @relation(fields: [cashSessionId], references: [id])
+<<<<<<< HEAD
   allocations CreditPaymentAllocation[]
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
 }
 
 model Sale {
@@ -528,7 +534,10 @@ model Sale {
   creditAmount    Decimal      @default(0) @db.Decimal(14, 2)
   status          SaleStatus   @default(COMPLETED)
   idempotencyKey  String       @unique
+<<<<<<< HEAD
   requestHash     String?
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   cancelledAt     DateTime?
   cancellationReason String?
   createdAt       DateTime     @default(now())
@@ -539,7 +548,10 @@ model Sale {
   items           SaleItem[]
   payments        SalePayment[]
   refunds         SaleRefund[]
+<<<<<<< HEAD
   creditAllocations CreditPaymentAllocation[]
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   @@index([createdAt])
   @@index([customerId, createdAt])
   @@index([userId, createdAt])
@@ -558,7 +570,10 @@ model SaleItem {
   sale         Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
   product      Product  @relation(fields: [productId], references: [id])
   refundItems  SaleRefundItem[]
+<<<<<<< HEAD
   batchAllocations SaleBatchAllocation[]
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   @@index([productId])
 }
 
@@ -580,7 +595,10 @@ model SaleRefund {
   code        String           @unique
   saleId      String
   amount      Decimal          @db.Decimal(14, 2)
+<<<<<<< HEAD
   creditAmount Decimal         @default(0) @db.Decimal(14, 2)
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
   reason      String
   returnsStock Boolean         @default(true)
   createdAt   DateTime         @default(now())
@@ -763,6 +781,7 @@ model Sequence {
   value     BigInt   @default(0)
   updatedAt DateTime @updatedAt
 }
+<<<<<<< HEAD
 
 model Operation {
   key String @id
@@ -804,3 +823,5 @@ model AssetCleanup {
   publicId String @id
   createdAt DateTime @default(now())
 }
+=======
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

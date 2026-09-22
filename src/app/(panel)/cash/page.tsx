@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { requirePermission } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { CashForm } from "@/components/cash-form";
@@ -47,3 +48,8 @@ export default async function CashPage() {
         </div>
     );
 }
+=======
+import { requirePermission } from "@/lib/auth";import{db}from"@/lib/db";import{CashForm}from"@/components/cash-form";
+export const dynamic="force-dynamic";
+export default async function CashPage(){const user=await requirePermission("cash.view");const[registers,session]=await Promise.all([db.cashRegister.findMany({where:{active:true}}),db.cashSession.findFirst({where:{userId:user.id,status:"OPEN"}})]);return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Caja</h1><p className="text-sm text-[var(--muted)]">{session?"Tu caja está abierta.":"Abre una caja antes de realizar ventas."}</p></div><div className="rounded-xl bg-[var(--card)] p-6 shadow-sm"><CashForm registers={registers} session={session?{id:session.id,openingAmount:session.openingAmount.toString()}:null}/></div></div>}
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9

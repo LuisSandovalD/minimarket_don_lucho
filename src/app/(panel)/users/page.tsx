@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 
 import { useState } from "react";
@@ -248,3 +249,7 @@ export function ManualSaleForm({ customers }: { customers: Customer[] }) {
     </form>
   );
 }
+=======
+import{db}from"@/lib/db";import{requirePermission}from"@/lib/auth";
+export const dynamic="force-dynamic";export default async function UsersPage(){await requirePermission("users.view");const users=await db.user.findMany({where:{deletedAt:null},include:{roles:{include:{role:true}}},orderBy:{name:"asc"}});return <div className="space-y-6"><div><h1 className="text-2xl font-semibold">Usuarios y roles</h1><p className="text-sm text-[var(--muted)]">Accesos asignados mediante RBAC.</p></div><div className="rounded-xl bg-[var(--card)] shadow-sm">{users.map(x=><div className="flex items-center justify-between border-b p-4 last:border-0" key={x.id}><div><p className="font-medium">{x.name}</p><p className="text-sm text-[var(--muted)]">{x.email}</p></div><div className="text-right text-sm"><p>{x.roles.map(r=>r.role.name).join(", ")}</p><p className={x.active?"text-emerald-600":"text-red-600"}>{x.active?"Activo":"Inactivo"}</p></div></div>)}</div></div>}
+>>>>>>> 3008127dd0bdc883b181438f1db61d13f3f5c6a9
