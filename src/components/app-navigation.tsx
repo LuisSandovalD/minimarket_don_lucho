@@ -20,22 +20,44 @@ type AppNavigationProps = { user: NavigationUser; cashOpen: boolean; children: R
 
 const logoImage = process.env.NEXT_PUBLIC_LOGO_IMAGE;
 
-const modules: NavItem[] = [
-    { label: "Inicio", href: "/dashboard", icon: LayoutDashboard, permissions: ["dashboard.view"], paths: ["/dashboard"] },
-    { label: "Ventas", href: "/sales", icon: ReceiptText, permissions: ["sales.view", "sales.create", "customers.view", "credits.view"], paths: ["/sales", "/pos", "/manage/customers", "/credits"] },
-    { label: "Productos", href: "/products", icon: Package, permissions: ["products.view", "inventory.view"], paths: ["/products", "/inventory", "/manage/categories", "/manage/brands", "/manage/units"] },
-    { label: "Compras", href: "/purchases", icon: ClipboardList, permissions: ["purchases.view", "purchases.create", "suppliers.view"], paths: ["/purchases", "/manage/suppliers"] },
-    { label: "Finanzas", href: "/finance", icon: WalletCards, permissions: ["cash.view", "expenses.view"], paths: ["/finance", "/cash", "/expenses"] },
-    { label: "Operaciones", href: "/operations", icon: Wrench, permissions: ["dashboard.view"], paths: ["/operations"] },
-];
-
-const administration: NavItem[] = [
-    { label: "Importaciones", href: "/imports", icon: FileSpreadsheet, permissions: ["imports.view"], paths: ["/imports"] },
-    { label: "Reportes", href: "/reports", icon: ChartNoAxesCombined, permissions: ["reports.sales"], paths: ["/reports"] },
-    { label: "Usuarios", href: "/manage/users", icon: Users, permissions: ["users.view"], paths: ["/manage/users"] },
-    { label: "Roles y permisos", href: "/manage/roles", icon: ShieldCheck, permissions: ["roles.view"], paths: ["/manage/roles"] },
-    { label: "Auditoría", href: "/audit", icon: History, permissions: ["audit.view"], paths: ["/audit"] },
-    { label: "Configuración", href: "/settings", icon: Settings, permissions: ["settings.view"], paths: ["/settings"] },
+const navigationSections: { label: string; items: NavItem[] }[] = [
+    {
+        label: "Principal",
+        items: [
+            { label: "Inicio", href: "/dashboard", icon: LayoutDashboard, permissions: ["dashboard.view"], paths: ["/dashboard"] },
+        ],
+    },
+    {
+        label: "Comercial",
+        items: [
+            { label: "Ventas", href: "/sales", icon: ReceiptText, permissions: ["sales.view", "sales.create", "customers.view", "credits.view"], paths: ["/sales", "/pos", "/manage/customers", "/credits"] },
+            { label: "Productos", href: "/products", icon: Package, permissions: ["products.view", "inventory.view"], paths: ["/products", "/inventory", "/manage/categories", "/manage/brands", "/manage/units"] },
+            { label: "Compras", href: "/purchases", icon: ClipboardList, permissions: ["purchases.view", "purchases.create", "suppliers.view"], paths: ["/purchases", "/manage/suppliers"] },
+        ],
+    },
+    {
+        label: "Control y caja",
+        items: [
+            { label: "Finanzas", href: "/finance", icon: WalletCards, permissions: ["cash.view", "expenses.view"], paths: ["/finance", "/cash", "/expenses"] },
+            { label: "Operaciones", href: "/operations", icon: Wrench, permissions: ["dashboard.view"], paths: ["/operations"] },
+        ],
+    },
+    {
+        label: "Gestión",
+        items: [
+            { label: "Importaciones", href: "/imports", icon: FileSpreadsheet, permissions: ["imports.view"], paths: ["/imports"] },
+            { label: "Reportes", href: "/reports", icon: ChartNoAxesCombined, permissions: ["reports.sales", "reports.inventory", "reports.profit", "reports.cash", "reports.credits"], paths: ["/reports"] },
+        ],
+    },
+    {
+        label: "Administración",
+        items: [
+            { label: "Usuarios", href: "/manage/users", icon: Users, permissions: ["users.view"], paths: ["/manage/users"] },
+            { label: "Roles y permisos", href: "/manage/roles", icon: ShieldCheck, permissions: ["roles.view"], paths: ["/manage/roles"] },
+            { label: "Auditoría", href: "/audit", icon: History, permissions: ["audit.view"], paths: ["/audit"] },
+            { label: "Configuración", href: "/settings", icon: Settings, permissions: ["settings.view"], paths: ["/settings"] },
+        ],
+    },
 ];
 
 function NavigationMenu({ items, activeHref }: { items: NavItem[]; activeHref?: string }) {
@@ -59,9 +81,10 @@ function UserAvatar({ name }: { name: string }) {
 
 export function AppNavigation({ user, cashOpen, children }: AppNavigationProps) {
     const path = usePathname();
-    const visibleModules = modules.filter(m => m.permissions.some(p => user.permissions.includes(p)));
-    const visibleAdmin = administration.filter(m => m.permissions.some(p => user.permissions.includes(p)));
-    const active = [...visibleModules, ...visibleAdmin].find(m => m.paths.some(p => path === p || path.startsWith(`${p}/`)));
+    const visibleSections = navigationSections
+        .map(section => ({ ...section, items: section.items.filter(item => item.permissions.some(permission => user.permissions.includes(permission))) }))
+        .filter(section => section.items.length > 0);
+    const active = visibleSections.flatMap(section => section.items).find(item => item.paths.some(itemPath => path === itemPath || path.startsWith(`${itemPath}/`)));
     const role = user.roles[0] ?? "Usuario";
     const canSettings = user.permissions.includes("settings.view");
 
@@ -85,16 +108,14 @@ export function AppNavigation({ user, cashOpen, children }: AppNavigationProps) 
                 </SidebarHeader>
 
                 <SidebarContent>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>Módulos</SidebarGroupLabel>
-                        <SidebarGroupContent><NavigationMenu items={visibleModules} activeHref={active?.href} /></SidebarGroupContent>
-                    </SidebarGroup>
-                    {visibleAdmin.length > 0 && (
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Administración</SidebarGroupLabel>
-                            <SidebarGroupContent><NavigationMenu items={visibleAdmin} activeHref={active?.href} /></SidebarGroupContent>
+                    {visibleSections.map(section => (
+                        <SidebarGroup key={section.label}>
+                            <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <NavigationMenu items={section.items} activeHref={active?.href} />
+                            </SidebarGroupContent>
                         </SidebarGroup>
-                    )}
+                    ))}
                 </SidebarContent>
 
                 <SidebarFooter className="p-2">
