@@ -47,7 +47,6 @@ export async function GET(request: Request) {
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
-
   const PW = 595.28;
   const PH = 841.89;
   const margin = perPage === 40 ? 14 : 18;
@@ -91,7 +90,6 @@ export async function GET(request: Request) {
 
       const sku = fitText(item.sku, font, style.sku, contentW);
       page.drawText(sku, { x: contentX, y: headerBottom + 4, size: style.sku, font, color: rgb(0.42, 0.42, 0.42) });
-
       page.drawLine({ start: { x: contentX, y: headerBottom }, end: { x: contentX + contentW, y: headerBottom }, thickness: 0.45, color: rgb(0.9, 0.9, 0.9) });
 
       try {
@@ -103,7 +101,7 @@ export async function GET(request: Request) {
         }
 
         if (mode === "barcode") {
-          const buffer = await bwipjs.toBuffer({ bcid: "code128", text: item.code.slice(0, 40), scale: 3, height: 10, includetext: false, paddingwidth: 0, paddingheight: 0 });
+          const buffer = await bwipjs.toBuffer({ bcid: "code128", text: item.code.slice(0, 40), scale: 3, height: 10, includetext: false });
           const barcode = await doc.embedPng(buffer);
           const maxW = contentW * 0.94;
           const maxH = codeH * 0.64;
@@ -111,6 +109,7 @@ export async function GET(request: Request) {
           let w = maxW;
           let h = w / ratio;
           if (h > maxH) { h = maxH; w = h * ratio; }
+
           page.drawImage(barcode, { x: contentX + (contentW - w) / 2, y: codeBottom + codeH - h - 3, width: w, height: h });
 
           const codeText = fitText(item.code, font, style.sku, contentW);
@@ -121,7 +120,7 @@ export async function GET(request: Request) {
         if (mode === "both") {
           const qrBuffer = await QRCode.toBuffer(JSON.stringify({ sku: item.sku }), { width: 240, margin: 0, errorCorrectionLevel: "M" });
           const qr = await doc.embedPng(qrBuffer);
-          const barcodeBuffer = await bwipjs.toBuffer({ bcid: "code128", text: item.code.slice(0, 40), scale: 3, height: 9, includetext: false, paddingwidth: 0, paddingheight: 0 });
+          const barcodeBuffer = await bwipjs.toBuffer({ bcid: "code128", text: item.code.slice(0, 40), scale: 3, height: 9, includetext: false });
           const barcode = await doc.embedPng(barcodeBuffer);
 
           const qrAreaW = contentW * 0.36;
