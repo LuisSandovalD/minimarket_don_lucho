@@ -51,11 +51,28 @@ async function main() {
 
   for (const unit of units) await db.unitOfMeasure.upsert({ where: { symbol: unit.symbol }, create: unit, update: unit });
 
-  const categories = ["Abarrotes", "Aceites y grasas", "Arroz y cereales", "Azúcar y endulzantes", "Menestras", "Harinas y repostería", "Pastas y fideos", "Conservas", "Condimentos y especias", "Salsas y aderezos", "Infusiones y café", "Panadería y bizcochos", "Galletas", "Snacks", "Golosinas", "Bebidas", "Agua", "Gaseosas", "Jugos y refrescos", "Bebidas energéticas y deportivas", "Lácteos", "Yogurt", "Leche", "Quesos", "Huevos", "Carnes y aves", "Pollo", "Embutidos", "Limpieza", "Detergentes", "Lavavajillas", "Lejías y desinfectantes", "Limpiadores", "Suavizantes", "Higiene personal", "Cuidado personal", "Cuidado bucal", "Cuidado capilar", "Papel e higiene", "Pañales y toallitas", "Botiquín y primeros auxilios", "Desechables", "Mascotas", "Otros"] as const;
+  const categories = ["Abarrotes", "Aceites y grasas", "Arroz y cereales", "Azúcar y endulzantes", "Menestras", "Harinas y repostería", "Pastas y fideos", "Conservas", "Atunes y pescados en conserva", "Condimentos y especias", "Salsas y aderezos", "Infusiones y café", "Panadería y bizcochos", "Galletas", "Snacks", "Golosinas", "Chocolates", "Caramelos y chicles", "Bebidas", "Agua", "Gaseosas", "Jugos y refrescos", "Bebidas energéticas y deportivas", "Bebidas instantáneas", "Lácteos", "Yogurt", "Leche", "Quesos", "Mantequilla y margarina", "Huevos", "Carnes y aves", "Pollo", "Embutidos", "Congelados", "Helados", "Frutas y verduras", "Limpieza", "Detergentes", "Lavavajillas", "Lejías y desinfectantes", "Limpiadores", "Suavizantes", "Esponjas y paños", "Higiene personal", "Cuidado personal", "Cuidado bucal", "Cuidado capilar", "Jabones", "Desodorantes", "Papel e higiene", "Papel higiénico", "Servilletas y papel toalla", "Pañales y toallitas", "Botiquín y primeros auxilios", "Desechables", "Bolsas y empaques", "Mascotas", "Alimento para mascotas", "Útiles escolares y oficina", "Pilas y accesorios", "Otros"] as const;
 
   for (const name of categories) {
     const slug = toSlug(name);
     await db.productCategory.upsert({ where: { slug }, create: { name, slug }, update: { name, active: true } });
+  }
+
+  const brands = [
+    "Coca-Cola", "Inca Kola", "Fanta", "Sprite", "Schweppes", "San Luis", "Powerade",
+    "Pepsi", "7UP", "Concordia", "Triple Kola", "KR", "Oro", "Cielo", "Sporade",
+    "Gloria", "Pura Vida", "Laive", "Nestlé", "Ideal", "Bonlé",
+    "Alicorp", "Primor", "Cocinero", "Don Vittorio", "Lavaggi", "Molitalia", "Costeño",
+    "Paisana", "Florida", "Campomar", "San Jorge", "Field", "Sublime", "Soda V",
+    "Ángel", "Casino", "Pícaras", "Chips Ahoy!", "Oreo", "Ritz",
+    "Bolívar", "Marsella", "Opal", "Ace", "Ariel", "Sapolio", "Ayudín",
+    "Poett", "Suave", "Elite", "Scott", "Huggies", "Pampers",
+    "Colgate", "Dento", "Sedal", "Pantene", "Head & Shoulders", "Dove", "Rexona", "Nivea",
+    "Ricocan", "Mimaskot", "Dog Chow"
+  ] as const;
+
+  for (const name of brands) {
+    await db.brand.upsert({ where: { name }, create: { name }, update: { active: true } });
   }
 
   for (const name of ["Servicios", "Movilidad", "Limpieza", "Mantenimiento", "Alimentación", "Bolsas", "Compras menores", "Otros"]) await db.expenseCategory.upsert({ where: { name }, create: { name }, update: { active: true } });
