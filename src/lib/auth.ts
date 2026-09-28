@@ -3,9 +3,12 @@ import { cookies, headers } from "next/headers";
 import argon2 from "argon2";
 import { db } from "@/lib/db";
 import { AppError } from "@/lib/errors";
+import { clientIpFromHeaders } from "@/lib/rate-limit";
 
 const COOKIE = "mdl_session";
 const DAYS = 7;
+const MAX_ACTIVE_SESSIONS = 5;
+
 export const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 export const createToken = () => randomBytes(32).toString("base64url");
 export const hashPassword = (password: string) => argon2.hash(password, { type: argon2.argon2id, memoryCost: 19456, timeCost: 2, parallelism: 1 });
@@ -14,10 +17,16 @@ export const verifyPassword = (hash: string, password: string) => argon2.verify(
 export async function createSession(userId: string) {
   const token = createToken();
   const headerStore = await headers();
-  const expiresAt = new Date(Date.now() + DAYS * 86400000);
-  await db.session.create({ data: { userId, tokenHash: hashToken(token), expiresAt, ip: headerStore.get("x-forwarded-for")?.split(",")[0]?.trim(), userAgent: headerStore.get("user-agent") } });
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + DAYS * 86400000);
+  await db.$transaction(async tx => {
+    await tx.session.deleteMany({ where: { userId, expiresAt: { lte: now } } });
+    const existing = await tx.session.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, select: { id: true }, skip: MAX_ACTIVE_SESSIONS - 1 });
+    if (existing.length) await tx.session.deleteMany({ where: { id: { in: existing.map(s => s.id) } } });
+    await tx.session.create({ data: { userId, tokenHash: hashToken(token), expiresAt, ip: clientIpFromHeaders(headerStore), userAgent: headerStore.get("user-agent")?.slice(0, 500) } });
+  });
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", expires: expiresAt });
+  cookieStore.set(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", expires: expiresAt, priority: "high" });
 }
 
 export async function destroySession() {
